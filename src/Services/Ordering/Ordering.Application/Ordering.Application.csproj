@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Application\BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Domain\BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\Billing\Billing.IntegrationEvents\Billing.IntegrationEvents.csproj" />
+    <ProjectReference Include="..\..\Dispatch\Dispatch.IntegrationEvents\Dispatch.IntegrationEvents.csproj" />
+    <ProjectReference Include="..\..\Kitchen\Kitchen.IntegrationEvents\Kitchen.IntegrationEvents.csproj" />
+    <ProjectReference Include="..\Ordering.Domain\Ordering.Domain.csproj" />
+    <ProjectReference Include="..\Ordering.IntegrationEvents\Ordering.IntegrationEvents.csproj" />
+  </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MassTransit" />
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Coupons\Queries\" />
+    </ItemGroup>
+</Project>
