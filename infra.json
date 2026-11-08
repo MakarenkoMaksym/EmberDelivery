@@ -1,0 +1,7 @@
+{
+    "Infrastructure": {
+        "Postgres": "postgres:17.2-alpine",
+        "Redis": "redis:7.4-alpine",
+        "RabbitMq": "rabbitmq:4.0-management-alpine"
+    }
+}

@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <Folder Include="Aggregates\Assignments\Events\" />
+    <Folder Include="Aggregates\CourierShifts\" />
+    <Folder Include="ValueObjects\" />
+  </ItemGroup>
+</Project>

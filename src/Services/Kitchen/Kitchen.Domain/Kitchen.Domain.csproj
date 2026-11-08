@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <Folder Include="Aggregates\Capacities\Events\" />
+    <Folder Include="Aggregates\Menus\Events\" />
+    <Folder Include="Aggregates\Tickets\Events\" />
+    <Folder Include="ValueObjects\" />
+  </ItemGroup>
+</Project>

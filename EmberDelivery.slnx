@@ -3,12 +3,13 @@
     <File Path=".editorconfig" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
+    <File Path="infra.json" />
   </Folder>
   <Folder Name="/src/" />
   <Folder Name="/src/ApiGateway/" />
   <Folder Name="/src/Aspire/">
-    <Project Path="src/Aspiration/AppHost/AppHost.csproj" Id="9741d30a-e194-4116-aced-1732009420af" />
-    <Project Path="src/Aspiration/ServiceDefaults/ServiceDefaults.csproj" Id="3e6d376d-68c6-46e9-9529-35b9969fcf21" />
+    <Project Path="src/Aspire/AppHost/AppHost.csproj" />
+    <Project Path="src/Aspire/ServiceDefaults/ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/src/BuildingBlocks/">
     <Project Path="src/BuildingBlocks/BuildingBlocks.Application/BuildingBlocks.Application.csproj" Id="e86fc3d0-94cd-42f1-a049-c7c7c95c68a3" />
@@ -38,6 +39,7 @@
   <Folder Name="/tests/Dispatch/" />
   <Folder Name="/tests/Kitchen/" />
   <Folder Name="/tests/Ordering/">
+    <Project Path="tests/Ordering/Ordering.IntegrationTests/Ordering.IntegrationTests.csproj" Id="b2e0e5f6-9649-4935-afc5-24366b8f6aa8" />
     <Project Path="tests/Ordering/Ordering.UnitTests/Ordering.UnitTests.csproj" Id="865b7449-1350-49cd-aa58-2f9503473214" />
   </Folder>
 </Solution>
