@@ -16,7 +16,13 @@ public readonly record struct Money : IValueObject
             throw new ArgumentException("Currency code is required.", nameof(currency));
         }
 
-        Amount = decimal.Round(amount, 2, MidpointRounding.ToEven);
+        // Money never rounds on its own: the business rule that produced a fractional cent must pick the rounding mode.
+        if (decimal.Round(amount, 2) != amount)
+        {
+            throw new ArgumentException("Money amount cannot have more than 2 decimal places.", nameof(amount));
+        }
+
+        Amount = amount;
         Currency = currency.Trim().ToUpperInvariant();
     }
 
@@ -42,16 +48,6 @@ public readonly record struct Money : IValueObject
     public static Money operator *(Money money, int multiplier)
     {
         if (multiplier < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(multiplier), "Multiplier cannot be negative.");
-        }
-
-        return new Money(money.Amount * multiplier, money.Currency);
-    }
-
-    public static Money operator *(Money money, decimal multiplier)
-    {
-        if (multiplier < 0m)
         {
             throw new ArgumentOutOfRangeException(nameof(multiplier), "Multiplier cannot be negative.");
         }

@@ -48,6 +48,8 @@ public sealed record DeliveryPricingPolicy : IValueObject
             return Money.Zero(BaseFee.Currency);
         }
 
-        return BaseFee * SurgeMultiplier;
+        // Commercial rounding (half away from zero) is what couriers and customers expect to see on a receipt.
+        decimal surgedFee = decimal.Round(BaseFee.Amount * SurgeMultiplier, 2, MidpointRounding.AwayFromZero);
+        return new Money(surgedFee, BaseFee.Currency);
     }
 }

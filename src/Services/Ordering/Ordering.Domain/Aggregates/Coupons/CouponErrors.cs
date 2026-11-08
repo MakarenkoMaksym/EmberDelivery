@@ -10,7 +10,7 @@ public static class CouponErrors
 
     public static readonly Error InvalidDiscountValue = Error.Validation(
         "Coupon.InvalidDiscountValue",
-        "Discount value must be greater than zero, and percentage discount cannot exceed 100%.");
+        "Discount value must be greater than zero with at most 2 decimal places, and percentage discount cannot exceed 100%.");
 
     public static readonly Error InvalidUsageLimits = Error.Validation(
         "Coupon.InvalidUsageLimits",

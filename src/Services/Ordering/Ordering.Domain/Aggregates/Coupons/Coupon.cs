@@ -48,7 +48,10 @@ public sealed class Coupon : AggregateRoot
             return Result.Failure<Coupon>(CouponErrors.InvalidCode);
         }
 
-        if (value <= 0m || (type == DiscountType.Percentage && value > 100m))
+        // Values with sub-cent precision would be silently truncated by storage and break Money construction later.
+        if (value <= 0m ||
+            decimal.Round(value, 2) != value ||
+            (type == DiscountType.Percentage && value > 100m))
         {
             return Result.Failure<Coupon>(CouponErrors.InvalidDiscountValue);
         }
@@ -117,7 +120,7 @@ public sealed class Coupon : AggregateRoot
         Money rawDiscount = Type switch
         {
             DiscountType.FixedAmount => new Money(Value, itemsSubtotal.Currency),
-            DiscountType.Percentage => new Money(itemsSubtotal.Amount * (Value / 100m), itemsSubtotal.Currency),
+            DiscountType.Percentage => new Money(CalculatePercentageDiscount(itemsSubtotal.Amount), itemsSubtotal.Currency),
             _ => throw new InvalidOperationException($"Unsupported discount type: {Type}")
         };
 
@@ -195,4 +198,8 @@ public sealed class Coupon : AggregateRoot
         IsActive = false;
         IncrementVersion();
     }
+
+    // Truncating toward zero guarantees the discount never exceeds the advertised percentage by a fractional cent.
+    private decimal CalculatePercentageDiscount(decimal itemsSubtotalAmount) =>
+        decimal.Round(itemsSubtotalAmount * Value / 100m, 2, MidpointRounding.ToZero);
 }
