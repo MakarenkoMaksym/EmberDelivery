@@ -1,0 +1,34 @@
+﻿<Project>
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <!-- Automatically prefix compiled DLLs and root C# namespaces with EmberDelivery while keeping folder names concise -->
+        <AssemblyName>EmberDelivery.$(MSBuildProjectName)</AssemblyName>
+        <RootNamespace>EmberDelivery.$(MSBuildProjectName)</RootNamespace>
+
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+        <!-- Required by Roslyn to enforce IDE0005 (Remove unnecessary usings) during CLI builds -->
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+        <!-- Suppress CS1591 globally to avoid build failures from missing XML comments on public members -->
+        <!-- Suppress ASPIRE010 to ignore Aspire CLI bundle warnings -->
+        <NoWarn>$(NoWarn);1591;ASPIRE010</NoWarn>
+
+        <WarningsNotAsErrors>NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
+
+        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj'">
+        <PackageReference Include="SonarAnalyzer.CSharp">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+</Project>

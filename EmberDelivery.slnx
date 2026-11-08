@@ -1,0 +1,43 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/ApiGateway/" />
+  <Folder Name="/src/Aspire/">
+    <Project Path="src/Aspiration/AppHost/AppHost.csproj" Id="9741d30a-e194-4116-aced-1732009420af" />
+    <Project Path="src/Aspiration/ServiceDefaults/ServiceDefaults.csproj" Id="3e6d376d-68c6-46e9-9529-35b9969fcf21" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Application/BuildingBlocks.Application.csproj" Id="e86fc3d0-94cd-42f1-a049-c7c7c95c68a3" />
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Domain/BuildingBlocks.Domain.csproj" Id="45e973cf-d130-4f6c-8f53-0d18e342f20a" />
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Infrastructure/BuildingBlocks.Infrastructure.csproj" Id="f41d510a-4e64-4faf-8945-af71f016a2da" />
+  </Folder>
+  <Folder Name="/src/Services/" />
+  <Folder Name="/src/Services/Billing/" />
+  <Folder Name="/src/Services/Dispatch/">
+    <Project Path="src/Services/Dispatch/Dispatch.Domain/Dispatch.Domain.csproj" Id="68e48887-ba58-4b59-bb58-7399ca7a6161" />
+  </Folder>
+  <Folder Name="/src/Services/Kitchen/">
+    <Project Path="src/Services/Kitchen/Kitchen.Domain/Kitchen.Domain.csproj" Id="4fb3043b-bf87-4cf3-97f2-80461275eecd" />
+  </Folder>
+  <Folder Name="/src/Services/Ordering/">
+    <Project Path="src/Services/Ordering/Ordering.Api/Ordering.Api.csproj" />
+    <Project Path="src/Services/Ordering/Ordering.Application/Ordering.Application.csproj" Id="9586b550-a516-44a7-836e-7f0207b35f63" />
+    <Project Path="src/Services/Ordering/Ordering.Domain/Ordering.Domain.csproj" Id="a28ff30f-2494-4f28-954a-6c646f079c06" />
+    <Project Path="src/Services/Ordering/Ordering.Infrastructure/Ordering.Infrastructure.csproj" Id="ee9afbf7-060a-40aa-9b52-8c7d820747d6" />
+    <Project Path="src/Services/Ordering/Ordering.IntegrationEvents/Ordering.IntegrationEvents.csproj" Id="8ca8563a-65ff-4481-85ef-e8f3282c2393" />
+  </Folder>
+  <Folder Name="/src/Services/RealtimeNotifier/" />
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/ArchitectureTests/">
+    <Project Path="tests/ArchitectureTests/ArchitectureTests/ArchitectureTests.csproj" Id="d48ba489-4c14-48d2-9318-bb25fcca12a1" />
+  </Folder>
+  <Folder Name="/tests/Dispatch/" />
+  <Folder Name="/tests/Kitchen/" />
+  <Folder Name="/tests/Ordering/">
+    <Project Path="tests/Ordering/Ordering.UnitTests/Ordering.UnitTests.csproj" Id="865b7449-1350-49cd-aa58-2f9503473214" />
+  </Folder>
+</Solution>
