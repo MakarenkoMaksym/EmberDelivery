@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+      <PackageReference Include="coverlet.collector">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
+      <PackageReference Include="FluentAssertions" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+      <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" />
+      <PackageReference Include="xunit.v3" />
+      <PackageReference Include="xunit.runner.visualstudio">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
+      <PackageReference Include="MassTransit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\Services\Billing\Billing.IntegrationEvents\Billing.IntegrationEvents.csproj" />
+        <ProjectReference Include="..\..\..\src\Services\Dispatch\Dispatch.IntegrationEvents\Dispatch.IntegrationEvents.csproj" />
+        <ProjectReference Include="..\..\..\src\Services\Kitchen\Kitchen.IntegrationEvents\Kitchen.IntegrationEvents.csproj" />
+        <ProjectReference Include="..\..\..\src\Services\Ordering\Ordering.Application\Ordering.Application.csproj" />
+        <ProjectReference Include="..\..\..\src\Services\Ordering\Ordering.Domain\Ordering.Domain.csproj" />
+        <ProjectReference Include="..\..\..\src\Services\Ordering\Ordering.IntegrationEvents\Ordering.IntegrationEvents.csproj" />
+    </ItemGroup>
+
+</Project>
