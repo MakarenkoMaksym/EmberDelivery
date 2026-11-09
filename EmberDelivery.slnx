@@ -17,12 +17,17 @@
     <Project Path="src/BuildingBlocks/BuildingBlocks.Infrastructure/BuildingBlocks.Infrastructure.csproj" Id="f41d510a-4e64-4faf-8945-af71f016a2da" />
   </Folder>
   <Folder Name="/src/Services/" />
-  <Folder Name="/src/Services/Billing/" />
+  <Folder Name="/src/Services/Billing/">
+    <Project Path="src/Services/Billing/Billing.Domain/Billing.Domain.csproj" Id="e813a2cd-91c8-4ef8-8262-7e199e6e4b59" />
+    <Project Path="src/Services/Billing/Billing.IntegrationEvents/Billing.IntegrationEvents.csproj" Id="137e4c63-92eb-4cc8-a3c4-464844e8123c" />
+  </Folder>
   <Folder Name="/src/Services/Dispatch/">
     <Project Path="src/Services/Dispatch/Dispatch.Domain/Dispatch.Domain.csproj" Id="68e48887-ba58-4b59-bb58-7399ca7a6161" />
+    <Project Path="src/Services/Dispatch/Dispatch.IntegrationEvents/Dispatch.IntegrationEvents.csproj" Id="0297b637-70ec-4103-91e1-15ef5d464824" />
   </Folder>
   <Folder Name="/src/Services/Kitchen/">
     <Project Path="src/Services/Kitchen/Kitchen.Domain/Kitchen.Domain.csproj" Id="4fb3043b-bf87-4cf3-97f2-80461275eecd" />
+    <Project Path="src/Services/Kitchen/Kitchen.IntegrationEvents/Kitchen.IntegrationEvents.csproj" Id="bd462e6f-fbff-46f4-9094-6be8b6830a78" />
   </Folder>
   <Folder Name="/src/Services/Ordering/">
     <Project Path="src/Services/Ordering/Ordering.Api/Ordering.Api.csproj" />
