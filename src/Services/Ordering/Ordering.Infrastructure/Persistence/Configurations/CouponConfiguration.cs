@@ -1,6 +1,5 @@
 ﻿using EmberDelivery.BuildingBlocks.Infrastructure.Persistence.Configurations;
 using EmberDelivery.Ordering.Domain.Aggregates.Coupons;
-using EmberDelivery.Ordering.Domain.ValueObjects;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -32,10 +31,9 @@ internal sealed class CouponConfiguration : AggregateRootConfiguration<Coupon>
             money.Property(m => m.Currency).HasColumnName("min_basket_currency").HasMaxLength(3);
         });
 
-        builder.Property(x => x.MaxDiscountCap)
-            .HasConversion(
-                v => v.HasValue ? v.Value.Amount : (decimal?)null,
-                v => v.HasValue ? new Money(v.Value, "UAH") : null)
+        // The cap shares the coupon currency stored in min_basket_currency, so only its amount needs a column.
+        builder.Ignore(x => x.MaxDiscountCap);
+        builder.Property<decimal?>("MaxDiscountCapAmount")
             .HasColumnName("max_discount_cap_amount")
             .HasPrecision(18, 2);
 

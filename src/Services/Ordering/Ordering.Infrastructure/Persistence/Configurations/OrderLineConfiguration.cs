@@ -1,6 +1,5 @@
 ﻿using EmberDelivery.BuildingBlocks.Infrastructure.Persistence.Configurations;
 using EmberDelivery.Ordering.Domain.Aggregates.Orders;
-using EmberDelivery.Ordering.Domain.ValueObjects;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -47,12 +46,16 @@ internal sealed class OrderLineConfiguration : EntityConfiguration<OrderLine>
             modBuilder.Property(m => m.ModifierId).IsRequired();
             modBuilder.Property(m => m.Name).HasMaxLength(150).IsRequired();
 
-            modBuilder.Property(m => m.Price)
-                .HasConversion(
-                    v => v.Amount,
-                    v => new Money(v, "UAH"))
+            // EF Core 10 has no ComplexProperty on owned types, so Money is flattened into the two columns it needs.
+            modBuilder.Ignore(m => m.Price);
+            modBuilder.Property<decimal>("PriceAmount")
                 .HasColumnName("price_amount")
-                .HasPrecision(18, 2);
+                .HasPrecision(18, 2)
+                .IsRequired();
+            modBuilder.Property<string>("PriceCurrency")
+                .HasColumnName("price_currency")
+                .HasMaxLength(3)
+                .IsRequired();
         });
 
         builder.Navigation(x => x.Modifiers)
