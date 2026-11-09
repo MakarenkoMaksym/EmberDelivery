@@ -15,9 +15,12 @@ using EmberDelivery.Ordering.Infrastructure.Persistence.Repositories;
 
 using MassTransit;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+using Npgsql;
 
 namespace EmberDelivery.Ordering.Infrastructure;
 
@@ -65,6 +68,20 @@ public static class DependencyInjection
 
             busConfigurator.AddConfigureEndpointsCallback((context, _, cfg) =>
             {
+                // Retry must wrap the outbox: every attempt then gets a new scope and DbContext, re-reads the saga or
+                // aggregate at its latest version and re-applies the transition instead of replaying a stale snapshot.
+                cfg.UseMessageRetry(retryCfg =>
+                {
+                    retryCfg.Handle<DbUpdateConcurrencyException>();
+                    retryCfg.Handle<PostgresException>(ex => ex.IsTransient);
+                    retryCfg.Handle<DbUpdateException>(ex => ex.InnerException is PostgresException { IsTransient: true });
+                    retryCfg.Exponential(
+                        retryLimit: 5,
+                        minInterval: TimeSpan.FromMilliseconds(50),
+                        maxInterval: TimeSpan.FromSeconds(2),
+                        intervalDelta: TimeSpan.FromMilliseconds(100));
+                });
+
                 cfg.UseEntityFrameworkOutbox<OrderingDbContext>(context);
             });
 

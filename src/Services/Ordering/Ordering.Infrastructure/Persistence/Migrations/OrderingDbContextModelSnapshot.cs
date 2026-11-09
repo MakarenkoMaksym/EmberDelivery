@@ -87,7 +87,7 @@ namespace EmberDelivery.Ordering.Infrastructure.Persistence.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_active");
 
-                    b.Property<decimal?>("MaxDiscountCap")
+                    b.Property<decimal?>("MaxDiscountCapAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("max_discount_cap_amount");
@@ -621,10 +621,16 @@ namespace EmberDelivery.Ordering.Infrastructure.Persistence.Migrations
                             b1.Property<Guid>("OrderLineId")
                                 .HasColumnType("uuid");
 
-                            b1.Property<decimal>("Price")
+                            b1.Property<decimal>("PriceAmount")
                                 .HasPrecision(18, 2)
                                 .HasColumnType("numeric(18,2)")
                                 .HasColumnName("price_amount");
+
+                            b1.Property<string>("PriceCurrency")
+                                .IsRequired()
+                                .HasMaxLength(3)
+                                .HasColumnType("character varying(3)")
+                                .HasColumnName("price_currency");
 
                             b1.HasKey("Id");
 
