@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-using EmberDelivery.Ordering.Application.Abstractions;
+﻿using EmberDelivery.Ordering.Application.Abstractions;
 using EmberDelivery.Ordering.Domain.Pricing;
 
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +25,7 @@ internal sealed class RestaurantMenuSnapshotReader(
         string? cachedJson = await TryReadFromRedisAsync(cacheKey, restaurantId, cancellationToken);
         if (!string.IsNullOrWhiteSpace(cachedJson))
         {
-            return JsonSerializer.Deserialize<RestaurantMenuSnapshot>(cachedJson);
+            return MenuSnapshotJson.Deserialize(cachedJson);
         }
 
         // Fallback to local PostgreSQL projection table (ECST).
@@ -43,7 +41,7 @@ internal sealed class RestaurantMenuSnapshotReader(
         // Best-effort cache repopulation; failures here must never abort order creation.
         await TryWriteToRedisAsync(cacheKey, record.PayloadJson, restaurantId);
 
-        return JsonSerializer.Deserialize<RestaurantMenuSnapshot>(record.PayloadJson);
+        return MenuSnapshotJson.Deserialize(record.PayloadJson);
     }
 
     internal static string GetCacheKey(Guid restaurantId) => $"ordering:menu-snapshot:{restaurantId:N}";
