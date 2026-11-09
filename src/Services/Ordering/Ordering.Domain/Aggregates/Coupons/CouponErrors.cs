@@ -16,6 +16,10 @@ public static class CouponErrors
         "Coupon.InvalidUsageLimits",
         "Usage limits must be at least 1 when specified.");
 
+    public static readonly Error CurrencyMismatch = Error.Validation(
+        "Coupon.CurrencyMismatch",
+        "Maximum discount cap must use the same currency as the minimum basket subtotal.");
+
     public static Error Inactive(string code) => Error.Conflict(
         "Coupon.Inactive",
         $"Coupon '{code}' is no longer active.");

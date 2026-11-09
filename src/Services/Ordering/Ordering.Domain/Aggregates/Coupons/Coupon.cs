@@ -18,7 +18,11 @@ public sealed class Coupon : AggregateRoot
 
     public Money MinimumBasketSubtotal { get; private set; }
 
-    public Money? MaxDiscountCap { get; private set; }
+    // A coupon is single-currency, so only the cap amount is persisted; the currency is always borrowed from
+    // MinimumBasketSubtotal and therefore cannot drift from it after a round trip through the database.
+    public Money? MaxDiscountCap => MaxDiscountCapAmount.HasValue
+        ? new Money(MaxDiscountCapAmount.Value, MinimumBasketSubtotal.Currency)
+        : null;
 
     public DateTimeOffset? ExpiresAtUtc { get; private set; }
 
@@ -31,6 +35,8 @@ public sealed class Coupon : AggregateRoot
     public int TotalRedemptionsCount { get; private set; }
 
     public bool IsActive { get; private set; }
+
+    private decimal? MaxDiscountCapAmount { get; set; }
 
     public static Result<Coupon> Create(
         string code,
@@ -61,6 +67,12 @@ public sealed class Coupon : AggregateRoot
             return Result.Failure<Coupon>(CouponErrors.InvalidUsageLimits);
         }
 
+        if (maxDiscountCap.HasValue &&
+            !string.Equals(maxDiscountCap.Value.Currency, minimumBasketSubtotal.Currency, StringComparison.Ordinal))
+        {
+            return Result.Failure<Coupon>(CouponErrors.CurrencyMismatch);
+        }
+
         Coupon coupon = new()
         {
             Id = Guid.NewGuid(),
@@ -68,7 +80,7 @@ public sealed class Coupon : AggregateRoot
             Type = type,
             Value = value,
             MinimumBasketSubtotal = minimumBasketSubtotal,
-            MaxDiscountCap = maxDiscountCap,
+            MaxDiscountCapAmount = maxDiscountCap?.Amount,
             ExpiresAtUtc = expiresAtUtc,
             RestrictedToRestaurantId = restrictedToRestaurantId,
             MaxTotalRedemptions = maxTotalRedemptions,
