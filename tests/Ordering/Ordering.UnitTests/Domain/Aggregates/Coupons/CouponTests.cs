@@ -139,6 +139,38 @@ public sealed class CouponTests
     }
 
     [Fact]
+    public void Create_WhenMaxDiscountCapCurrencyDiffersFromMinimumBasket_ShouldReturnCurrencyMismatchFailure()
+    {
+        // Act
+        Result<Coupon> result = Coupon.Create(
+            "CODE",
+            DiscountType.Percentage,
+            10m,
+            new Money(100m, "EUR"),
+            maxDiscountCap: new Money(20m, "UAH"));
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(CouponErrors.CurrencyMismatch);
+    }
+
+    [Fact]
+    public void Create_WhenMaxDiscountCapUsesMinimumBasketCurrency_ShouldExposeCapInThatCurrency()
+    {
+        // Act
+        Result<Coupon> result = Coupon.Create(
+            "CODE",
+            DiscountType.Percentage,
+            10m,
+            new Money(100m, "EUR"),
+            maxDiscountCap: new Money(20m, "eur"));
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.MaxDiscountCap.Should().Be(new Money(20m, "EUR"));
+    }
+
+    [Fact]
     public void EvaluateDiscount_WhenFixedAmount_ShouldReturnFixedValue()
     {
         // Arrange
