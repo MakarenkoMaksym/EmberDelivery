@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 
+using EmberDelivery.ArchitectureTests.Rules;
 using EmberDelivery.BuildingBlocks.Application.Messaging;
 using EmberDelivery.BuildingBlocks.Domain.Abstractions;
-using EmberDelivery.BuildingBlocks.Infrastructure.Persistence.Configurations;
 using EmberDelivery.Ordering.Api.Endpoints;
 using EmberDelivery.Ordering.Domain.Aggregates.Orders;
 using EmberDelivery.Ordering.Infrastructure.Persistence;
@@ -10,10 +10,6 @@ using EmberDelivery.Ordering.Infrastructure.Persistence;
 using FluentAssertions;
 
 using FluentValidation;
-
-using Microsoft.EntityFrameworkCore;
-
-using Mono.Cecil;
 
 using NetArchTest.Rules;
 
@@ -55,7 +51,7 @@ public sealed class CleanArchitectureTests
                 "StackExchange.Redis")
             .GetResult();
 
-        result.IsSuccessful.Should().BeTrue($"{contextName}.Domain violated layer isolation: {GetFailingTypes(result)}");
+        result.IsSuccessful.Should().BeTrue($"{contextName}.Domain violated layer isolation: {result.DescribeFailingTypes()}");
     }
 
     [Theory]
@@ -78,7 +74,7 @@ public sealed class CleanArchitectureTests
                 "StackExchange.Redis")
             .GetResult();
 
-        result.IsSuccessful.Should().BeTrue($"{contextName}.Application violated layer isolation: {GetFailingTypes(result)}");
+        result.IsSuccessful.Should().BeTrue($"{contextName}.Application violated layer isolation: {result.DescribeFailingTypes()}");
     }
 
     [Theory]
@@ -101,7 +97,7 @@ public sealed class CleanArchitectureTests
             .MeetCustomRule(new TrulyImmutableValueObjectRule())
             .GetResult();
 
-        result.IsSuccessful.Should().BeTrue($"{contextName}.Domain has mutable ValueObjects: {GetFailingTypes(result)}");
+        result.IsSuccessful.Should().BeTrue($"{contextName}.Domain has mutable ValueObjects: {result.DescribeFailingTypes()}");
     }
 
     [Theory]
@@ -141,8 +137,8 @@ public sealed class CleanArchitectureTests
             .BeSealed()
             .GetResult();
 
-        handlersResult.IsSuccessful.Should().BeTrue($"{contextName} handlers must be internal sealed: {GetFailingTypes(handlersResult)}");
-        validatorsResult.IsSuccessful.Should().BeTrue($"{contextName} validators must be internal sealed: {GetFailingTypes(validatorsResult)}");
+        handlersResult.IsSuccessful.Should().BeTrue($"{contextName} handlers must be internal sealed: {handlersResult.DescribeFailingTypes()}");
+        validatorsResult.IsSuccessful.Should().BeTrue($"{contextName} validators must be internal sealed: {validatorsResult.DescribeFailingTypes()}");
     }
 
     [Theory]
@@ -158,55 +154,8 @@ public sealed class CleanArchitectureTests
         _ = applicationAssembly;
         _ = apiAssembly;
 
-        Type openConfigInterface = typeof(IEntityTypeConfiguration<>);
-        List<string> violations = [];
-
-        IEnumerable<Type> configurationTypes = infrastructureAssembly.GetTypes()
-            .Where(t => t is { IsClass: true, IsAbstract: false });
-
-        foreach (Type configType in configurationTypes)
-        {
-            Type? implementedConfigInterface = configType.GetInterfaces()
-                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == openConfigInterface);
-
-            if (implementedConfigInterface is null)
-            {
-                continue;
-            }
-
-            Type targetModelType = implementedConfigInterface.GetGenericArguments()[0];
-
-            if (targetModelType.IsAssignableTo(typeof(AggregateRoot<Guid>)))
-            {
-                Type expectedBase = typeof(AggregateRootConfiguration<>).MakeGenericType(targetModelType);
-                if (!configType.IsAssignableTo(expectedBase))
-                {
-                    violations.Add($"{configType.Name} configures AggregateRoot '{targetModelType.Name}' and must inherit from AggregateRootConfiguration<{targetModelType.Name}>.");
-                }
-            }
-            else if (targetModelType.IsAssignableTo(typeof(Entity<Guid>)))
-            {
-                Type expectedBase = typeof(EntityConfiguration<>).MakeGenericType(targetModelType);
-                if (!configType.IsAssignableTo(expectedBase))
-                {
-                    violations.Add($"{configType.Name} configures Entity '{targetModelType.Name}' and must inherit from EntityConfiguration<{targetModelType.Name}>.");
-                }
-            }
-        }
+        IReadOnlyList<string> violations = EfConfigurationConventions.FindViolations(infrastructureAssembly);
 
         violations.Should().BeEmpty($"{contextName}.Infrastructure has entity configurations bypassing base conventions");
-    }
-
-    private static string GetFailingTypes(ArchTestResult result) =>
-        result.FailingTypeNames is null ? string.Empty : string.Join(", ", result.FailingTypeNames);
-
-    private sealed class TrulyImmutableValueObjectRule : ICustomRule
-    {
-        public bool MeetsRule(TypeDefinition type)
-        {
-            return type.Fields
-                .Where(f => !f.IsStatic)
-                .All(f => f.IsInitOnly);
-        }
     }
 }

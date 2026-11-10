@@ -29,6 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\src\Services\Billing\Billing.Api\Billing.Api.csproj" />
         <ProjectReference Include="..\..\..\src\Services\Ordering\Ordering.Api\Ordering.Api.csproj" />
         <ProjectReference Include="..\..\..\src\Services\Ordering\Ordering.Application\Ordering.Application.csproj" />
         <ProjectReference Include="..\..\..\src\Services\Ordering\Ordering.Domain\Ordering.Domain.csproj" />
