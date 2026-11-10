@@ -17,6 +17,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Include="..\..\..\infra.json" Link="infra.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Services\Billing\Billing.Api\Billing.Api.csproj" />
       <ProjectReference Include="..\..\Services\Ordering\Ordering.Api\Ordering.Api.csproj" />
     </ItemGroup>
 

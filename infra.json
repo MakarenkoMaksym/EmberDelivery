@@ -2,6 +2,7 @@
     "Infrastructure": {
         "Postgres": "postgres:17.2-alpine",
         "Redis": "redis:7.4-alpine",
-        "RabbitMq": "rabbitmq:4.0-management-alpine"
+        "RabbitMq": "rabbitmq:4.0-management-alpine",
+        "Keycloak": "quay.io/keycloak/keycloak:26.6"
     }
 }

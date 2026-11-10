@@ -18,7 +18,7 @@
   </Folder>
   <Folder Name="/src/Services/" />
   <Folder Name="/src/Services/Billing/">
-    <Project Path="src/Services/Billing/Billing.Domain/Billing.Domain.csproj" Id="e813a2cd-91c8-4ef8-8262-7e199e6e4b59" />
+    <Project Path="src/Services/Billing/Billing.Api/Billing.Api.csproj" />
     <Project Path="src/Services/Billing/Billing.IntegrationEvents/Billing.IntegrationEvents.csproj" Id="137e4c63-92eb-4cc8-a3c4-464844e8123c" />
   </Folder>
   <Folder Name="/src/Services/Dispatch/">
@@ -40,6 +40,10 @@
   <Folder Name="/tests/" />
   <Folder Name="/tests/ArchitectureTests/">
     <Project Path="tests/ArchitectureTests/ArchitectureTests/ArchitectureTests.csproj" Id="d48ba489-4c14-48d2-9318-bb25fcca12a1" />
+  </Folder>
+  <Folder Name="/tests/Billing/">
+    <Project Path="tests/Billing/Billing.IntegrationTests/Billing.IntegrationTests.csproj" />
+    <Project Path="tests/Billing/Billing.UnitTests/Billing.UnitTests.csproj" />
   </Folder>
   <Folder Name="/tests/Dispatch/" />
   <Folder Name="/tests/Kitchen/" />
