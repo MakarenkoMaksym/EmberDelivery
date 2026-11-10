@@ -1,5 +1,6 @@
 ﻿using EmberDelivery.BuildingBlocks.Application.Abstractions.Identity;
 using EmberDelivery.BuildingBlocks.Domain.Results;
+using EmberDelivery.BuildingBlocks.Infrastructure.Identity;
 using EmberDelivery.BuildingBlocks.Infrastructure.Presentation;
 using EmberDelivery.Ordering.Application.Orders.Commands.CancelOrderByCustomer;
 
@@ -27,7 +28,7 @@ public sealed class CancelOrderEndpoint : IEndpoint
         })
         .WithName("CancelOrder")
         .WithTags(EndpointTags.Orders)
-        .RequireAuthorization("RequireCustomer")
+        .RequireAuthorization(AuthorizationPolicies.RequireCustomer)
         .Produces(StatusCodes.Status204NoContent)
         .ProducesProblem(StatusCodes.Status401Unauthorized)
         .ProducesProblem(StatusCodes.Status403Forbidden)

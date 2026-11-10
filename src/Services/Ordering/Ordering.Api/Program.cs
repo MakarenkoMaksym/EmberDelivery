@@ -1,3 +1,4 @@
+using EmberDelivery.BuildingBlocks.Infrastructure.Identity;
 using EmberDelivery.BuildingBlocks.Infrastructure.Presentation;
 using EmberDelivery.Ordering.Api.Extensions;
 using EmberDelivery.Ordering.Application;
@@ -11,7 +12,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.Services.AddWebApiServices();
-builder.Services.AddKeycloakAuth();
+builder.AddKeycloakAuth();
 
 builder.Services.AddOrderingApplication();
 builder.AddOrderingInfrastructure(typeof(Program).Assembly);

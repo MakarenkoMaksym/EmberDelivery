@@ -1,4 +1,5 @@
 ﻿using EmberDelivery.BuildingBlocks.Domain.Results;
+using EmberDelivery.BuildingBlocks.Infrastructure.Identity;
 using EmberDelivery.BuildingBlocks.Infrastructure.Presentation;
 using EmberDelivery.Ordering.Application.Coupons.Commands.CreateCoupon;
 using EmberDelivery.Ordering.Domain.Aggregates.Coupons;
@@ -49,7 +50,7 @@ public sealed class CreateCouponEndpoint : IEndpoint
         })
         .WithName("CreateCoupon")
         .WithTags(EndpointTags.Coupons)
-        .RequireAuthorization("RequireAdmin")
+        .RequireAuthorization(AuthorizationPolicies.RequireAdmin)
         .Produces<CreateCouponResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status401Unauthorized)

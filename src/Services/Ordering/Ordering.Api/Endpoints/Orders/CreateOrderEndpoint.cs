@@ -1,5 +1,6 @@
 ﻿using EmberDelivery.BuildingBlocks.Application.Abstractions.Identity;
 using EmberDelivery.BuildingBlocks.Domain.Results;
+using EmberDelivery.BuildingBlocks.Infrastructure.Identity;
 using EmberDelivery.BuildingBlocks.Infrastructure.Presentation;
 using EmberDelivery.Ordering.Application.Orders.Commands.CreateOrder;
 
@@ -49,7 +50,7 @@ public sealed class CreateOrderEndpoint : IEndpoint
         })
         .WithName("CreateOrder")
         .WithTags(EndpointTags.Orders)
-        .RequireAuthorization("RequireCustomer")
+        .RequireAuthorization(AuthorizationPolicies.RequireCustomer)
         .Produces<CreateOrderResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status401Unauthorized)

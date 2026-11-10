@@ -1,5 +1,6 @@
 ﻿using EmberDelivery.BuildingBlocks.Application.Abstractions.Identity;
 using EmberDelivery.BuildingBlocks.Domain.Results;
+using EmberDelivery.BuildingBlocks.Infrastructure.Identity;
 using EmberDelivery.BuildingBlocks.Infrastructure.Presentation;
 using EmberDelivery.Ordering.Application.Orders.Queries.GetOrderById;
 
@@ -24,7 +25,7 @@ public sealed class GetOrderByIdEndpoint : IEndpoint
         })
         .WithName("GetOrderById")
         .WithTags(EndpointTags.Orders)
-        .RequireAuthorization("RequireCustomer")
+        .RequireAuthorization(AuthorizationPolicies.RequireCustomer)
         .Produces<OrderResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status401Unauthorized)
         .ProducesProblem(StatusCodes.Status403Forbidden)
