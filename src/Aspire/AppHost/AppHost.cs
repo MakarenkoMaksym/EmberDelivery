@@ -43,4 +43,6 @@ builder.AddProject<Projects.Billing_Api>("billing-api")
     .WaitFor(messaging)
     .WaitFor(keycloak);
 
+builder.AddProject<Projects.Kitchen_Api>("kitchen-api");
+
 await builder.Build().RunAsync();

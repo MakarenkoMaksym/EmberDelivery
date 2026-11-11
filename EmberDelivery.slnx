@@ -26,7 +26,10 @@
     <Project Path="src/Services/Dispatch/Dispatch.IntegrationEvents/Dispatch.IntegrationEvents.csproj" Id="0297b637-70ec-4103-91e1-15ef5d464824" />
   </Folder>
   <Folder Name="/src/Services/Kitchen/">
+    <Project Path="src/Services/Kitchen/Kitchen.Api/Kitchen.Api.csproj" />
+    <Project Path="src/Services/Kitchen/Kitchen.Application/Kitchen.Application.csproj" Id="02db7a85-26d1-4579-ab8a-a856eca9e010" />
     <Project Path="src/Services/Kitchen/Kitchen.Domain/Kitchen.Domain.csproj" Id="4fb3043b-bf87-4cf3-97f2-80461275eecd" />
+    <Project Path="src/Services/Kitchen/Kitchen.Infrastructure/Kitchen.Infrastructure.csproj" Id="f3a1dce3-be15-4a66-837b-164480b3290a" />
     <Project Path="src/Services/Kitchen/Kitchen.IntegrationEvents/Kitchen.IntegrationEvents.csproj" Id="bd462e6f-fbff-46f4-9094-6be8b6830a78" />
   </Folder>
   <Folder Name="/src/Services/Ordering/">

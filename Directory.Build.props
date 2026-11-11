@@ -12,6 +12,10 @@
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
+        <NuGetAudit>true</NuGetAudit>
+        <NuGetAuditLevel>low</NuGetAuditLevel>
+        <NuGetAuditMode>all</NuGetAuditMode>
+
         <!-- Required by Roslyn to enforce IDE0005 (Remove unnecessary usings) during CLI builds -->
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
