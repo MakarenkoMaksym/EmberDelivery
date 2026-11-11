@@ -1,6 +1,6 @@
 ﻿namespace EmberDelivery.Ordering.IntegrationEvents;
 
-public class OrderSagaTimeouts
+public static class OrderSagaTimeouts
 {
     public sealed record TriggerCourierDispatchTimeout(
     Guid OrderId);

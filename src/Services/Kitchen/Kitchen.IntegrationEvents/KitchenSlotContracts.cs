@@ -1,6 +1,6 @@
 ﻿namespace EmberDelivery.Kitchen.IntegrationEvents;
 
-public class KitchenSlotContracts
+public static class KitchenSlotContracts
 {
     public sealed record ConfirmKitchenCapacityCommand(
     Guid OrderId,

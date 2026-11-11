@@ -1,6 +1,6 @@
 ﻿namespace EmberDelivery.Kitchen.IntegrationEvents;
 
-public class MenuContracts
+public static class MenuContracts
 {
     public sealed record RestaurantMenuSnapshotUpdatedIntegrationEvent(
     Guid RestaurantId,

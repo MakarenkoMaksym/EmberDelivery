@@ -1,6 +1,6 @@
 ﻿namespace EmberDelivery.Billing.IntegrationEvents;
 
-public class PaymentContracts
+public static class PaymentContracts
 {
     public sealed record HoldFundsCommand(
     Guid OrderId,

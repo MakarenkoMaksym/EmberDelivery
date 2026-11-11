@@ -1,6 +1,6 @@
 ﻿namespace EmberDelivery.Ordering.IntegrationEvents;
 
-public class OrderSagaLifecycleEvents
+public static class OrderSagaLifecycleEvents
 {
     public sealed record OrderPaymentConfirmedIntegrationEvent(
     Guid OrderId);

@@ -1,6 +1,6 @@
 ﻿namespace EmberDelivery.Dispatch.IntegrationEvents;
 
-public class CourierContracts
+public static class CourierContracts
 {
     public sealed record StartCourierMatchingCommand(
     Guid OrderId,
