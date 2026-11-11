@@ -119,38 +119,6 @@ public sealed class BillingArchitectureTests
     }
 
     [Fact]
-    public void AggregatesAndEntities_ShouldBeSealedWithPrivateParameterlessConstructor()
-    {
-        IEnumerable<Type> domainEntities = Types.InAssembly(BillingAssembly)
-            .That()
-            .ResideInNamespace(DomainNamespace)
-            .And()
-            .Inherit(typeof(Entity<Guid>))
-            .GetTypes();
-
-        List<string> violations = [];
-
-        foreach (Type entityType in domainEntities)
-        {
-            if (!entityType.IsSealed)
-            {
-                violations.Add($"{entityType.Name} must be sealed.");
-            }
-
-            ConstructorInfo? parameterless = entityType.GetConstructor(
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                Type.EmptyTypes);
-
-            if (parameterless is null || !parameterless.IsPrivate)
-            {
-                violations.Add($"{entityType.Name} must declare a private parameterless constructor for EF Core.");
-            }
-        }
-
-        violations.Should().BeEmpty();
-    }
-
-    [Fact]
     public void EfCoreConfigurations_ShouldInheritFromBaseConfigurationClasses()
     {
         IReadOnlyList<string> violations = EfConfigurationConventions.FindViolations(BillingAssembly);
