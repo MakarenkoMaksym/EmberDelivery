@@ -34,6 +34,9 @@ namespace EmberDelivery.Ordering.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("CourierDispatchScheduleTokenId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("CourierPickupTimeoutTokenId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Currency")
                         .IsRequired()
                         .HasMaxLength(3)
@@ -51,7 +54,13 @@ namespace EmberDelivery.Ordering.Infrastructure.Persistence.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<Guid?>("KitchenConfirmationTimeoutTokenId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("PaymentHoldId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("PaymentHoldTimeoutTokenId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("RestaurantId")

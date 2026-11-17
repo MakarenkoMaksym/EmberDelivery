@@ -24,5 +24,11 @@ public sealed class OrderSagaState : SagaStateMachineInstance
 
     public Guid? CourierDispatchScheduleTokenId { get; set; }
 
+    public Guid? PaymentHoldTimeoutTokenId { get; set; }
+
+    public Guid? KitchenConfirmationTimeoutTokenId { get; set; }
+
+    public Guid? CourierPickupTimeoutTokenId { get; set; }
+
     public uint Version { get; set; } = 1;
 }

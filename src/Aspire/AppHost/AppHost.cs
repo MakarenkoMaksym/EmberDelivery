@@ -14,10 +14,12 @@ IResourceBuilder<PostgresDatabaseResource> billingDb = postgres.AddDatabase("bil
 IResourceBuilder<RedisResource> redis = builder.AddRedis("redis")
     .WithPinnedImage(images.Redis);
 
-// The pinned image already ships the management plugin, so the UI port is exposed directly; WithManagementPlugin()
-// would rewrite the image tag and override the version taken from infra.json.
+// Built from infra/rabbitmq on top of the infra.json image to add the delayed-message exchange required by the saga
+// timeouts. The base image already ships the management plugin, so the UI port is exposed directly;
+// WithManagementPlugin() would rewrite the image tag and override the pinned version.
 IResourceBuilder<RabbitMQServerResource> messaging = builder.AddRabbitMQ("messaging")
-    .WithPinnedImage(images.RabbitMq)
+    .WithDockerfile("../../../infra/rabbitmq")
+    .WithBuildArg("RABBITMQ_IMAGE", images.RabbitMq.ToString())
     .WithHttpEndpoint(targetPort: 15672, name: "management");
 
 // Fixed host port: services validate tokens against issuers on localhost:8080 (KeycloakAuthOptions defaults).
