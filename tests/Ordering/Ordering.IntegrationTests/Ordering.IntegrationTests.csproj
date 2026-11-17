@@ -11,6 +11,7 @@
 
     <ItemGroup>
         <Content Include="..\..\..\infra.json" Link="infra.json" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="..\..\..\infra\rabbitmq\Dockerfile" Link="rabbitmq\Dockerfile" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>

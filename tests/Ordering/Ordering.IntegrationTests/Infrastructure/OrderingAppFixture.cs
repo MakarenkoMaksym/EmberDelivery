@@ -1,5 +1,8 @@
 ﻿using System.Data.Common;
 
+using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Images;
+
 using EmberDelivery.Ordering.Infrastructure.Persistence;
 
 using MassTransit;
@@ -42,14 +45,27 @@ public sealed class OrderingAppFixture : WebApplicationFactory<Program>, IAsyncL
             Config["Infrastructure:Redis"] ?? throw new InvalidOperationException("Redis image configuration is missing."))
         .Build();
 
-    private readonly RabbitMqContainer _rabbitMqContainer = new RabbitMqBuilder(
+    // Same Dockerfile as the AppHost: the saga schedules timeouts through the delayed-message exchange, which the
+    // official image lacks, so the plain infra.json image would fault on the first OrderSubmitted.
+    private readonly IFutureDockerImage _rabbitMqImage = new ImageFromDockerfileBuilder()
+        .WithDockerfileDirectory(Path.Combine(AppContext.BaseDirectory, "rabbitmq"))
+        .WithBuildArgument(
+            "RABBITMQ_IMAGE",
             Config["Infrastructure:RabbitMq"] ?? throw new InvalidOperationException("RabbitMq image configuration is missing."))
-        .WithUsername("guest")
-        .WithPassword("guest")
         .Build();
+
+    private readonly RabbitMqContainer _rabbitMqContainer;
 
     private DbConnection _dbConnection = null!;
     private Respawner _respawner = null!;
+
+    public OrderingAppFixture()
+    {
+        _rabbitMqContainer = new RabbitMqBuilder(_rabbitMqImage)
+            .WithUsername("guest")
+            .WithPassword("guest")
+            .Build();
+    }
 
     public string DbConnectionString => _dbContainer.GetConnectionString();
 
@@ -59,6 +75,8 @@ public sealed class OrderingAppFixture : WebApplicationFactory<Program>, IAsyncL
 
     public async ValueTask InitializeAsync()
     {
+        await _rabbitMqImage.CreateAsync();
+
         await Task.WhenAll(
             _dbContainer.StartAsync(),
             _redisContainer.StartAsync(),
@@ -121,6 +139,8 @@ public sealed class OrderingAppFixture : WebApplicationFactory<Program>, IAsyncL
             _dbContainer.DisposeAsync().AsTask(),
             _redisContainer.DisposeAsync().AsTask(),
             _rabbitMqContainer.DisposeAsync().AsTask());
+
+        await _rabbitMqImage.DisposeAsync();
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
