@@ -64,8 +64,14 @@ public sealed class Order : AggregateRoot
             return Result.Failure<Order>(OrderErrors.EmptyBasket);
         }
 
+        // Lines are priced from the menu, so they, not the client's expectation, define the order currency.
+        string currency = lines.First().LineTotal.Currency;
+        if (!string.Equals(expectedTotalPrice.Currency, currency, StringComparison.Ordinal))
+        {
+            return Result.Failure<Order>(OrderErrors.CurrencyMismatch(expectedTotalPrice.Currency, currency));
+        }
+
         DateTimeOffset nowUtc = timeProvider.GetUtcNow();
-        string currency = expectedTotalPrice.Currency;
 
         Money itemsSubtotal = lines.Aggregate(Money.Zero(currency), (acc, line) => acc + line.LineTotal);
 

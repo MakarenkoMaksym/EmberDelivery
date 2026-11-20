@@ -52,6 +52,10 @@ public static class OrderErrors
         "Order.BelowMinimumBasket",
         $"The restaurant requires a minimum basket of {requiredAmount:0.00}, but the current subtotal is {actualAmount:0.00}.");
 
+    public static Error CurrencyMismatch(string requestedCurrency, string menuCurrency) => Error.Validation(
+        "Order.CurrencyMismatch",
+        $"The order was requested in '{requestedCurrency}', but the restaurant prices its menu in '{menuCurrency}'.");
+
     public static Error PriceChanged(decimal expectedAmount, decimal actualAmount) => Error.Conflict(
         "Order.PriceChanged",
         $"The total price changed from {expectedAmount:0.00} to {actualAmount:0.00} while you were checking out.");

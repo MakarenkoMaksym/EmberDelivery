@@ -153,6 +153,23 @@ public sealed class CreateOrderEndpointTests(OrderingAppFixture fixture) : BaseI
     }
 
     [Fact]
+    public async Task CreateOrder_InCurrencyOtherThanMenu_ShouldReturnBadRequestAndNotPersistOrder()
+    {
+        // Arrange
+        Guid restaurantId = await SeedRestaurantMenuAsync(currency: "UAH");
+
+        // Act
+        HttpResponseMessage response = await HttpClient.PostAsJsonAsync(
+            OrdersUrl,
+            TestMenu.StandardOrderRequest(restaurantId, currency: "USD"),
+            CancellationToken);
+
+        // Assert
+        await response.ShouldBeProblemAsync(HttpStatusCode.BadRequest, "Order.CurrencyMismatch");
+        (await CountOrdersAsync()).Should().Be(0);
+    }
+
+    [Fact]
     public async Task CreateOrder_WhenRestaurantIsNotAcceptingOrders_ShouldReturnConflict()
     {
         // Arrange

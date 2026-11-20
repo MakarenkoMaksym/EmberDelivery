@@ -47,6 +47,13 @@ internal sealed class CreateOrderCommandHandler(
                 Error.Conflict("Order.RestaurantUnavailable", "The restaurant is currently closed or unavailable."));
         }
 
+        // Money refuses cross-currency arithmetic by throwing, so a foreign client currency must be rejected up front.
+        string menuCurrency = menuSnapshot.BaseDeliveryFee.Currency;
+        if (!string.Equals(request.Currency.Trim(), menuCurrency, StringComparison.OrdinalIgnoreCase))
+        {
+            return Result.Failure<Guid>(OrderErrors.CurrencyMismatch(request.Currency, menuCurrency));
+        }
+
         Result<DeliveryAddress> addressResult = DeliveryAddress.Create(
             request.Street,
             request.Building,
