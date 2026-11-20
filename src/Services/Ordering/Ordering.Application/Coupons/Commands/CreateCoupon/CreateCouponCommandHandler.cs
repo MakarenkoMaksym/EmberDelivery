@@ -27,9 +27,8 @@ internal sealed class CreateCouponCommandHandler(
         CancellationToken cancellationToken)
     {
         string normalizedCode = request.Code.Trim().ToUpperInvariant();
-        Coupon? existing = await couponRepository.GetActiveByCodeAsync(normalizedCode, cancellationToken);
-
-        if (existing is not null)
+        // Fast path for the common duplicate; a concurrent insert that slips past it is rejected by the unique index.
+        if (await couponRepository.ExistsActiveByCodeAsync(normalizedCode, cancellationToken))
         {
             return Result.Failure<Guid>(
                 Error.Conflict("Coupon.CodeAlreadyExists", $"An active coupon with code '{normalizedCode}' already exists."));

@@ -12,6 +12,12 @@ internal sealed class CouponRepository(OrderingDbContext dbContext) : ICouponRep
             .FirstOrDefaultAsync(x => x.Code == normalizedCode && x.IsActive, cancellationToken);
     }
 
+    public Task<bool> ExistsActiveByCodeAsync(string normalizedCode, CancellationToken cancellationToken = default)
+    {
+        return dbContext.Coupons
+            .AnyAsync(x => x.Code == normalizedCode && x.IsActive, cancellationToken);
+    }
+
     public Task<Coupon?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return dbContext.Coupons

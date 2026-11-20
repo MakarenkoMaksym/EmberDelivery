@@ -4,6 +4,8 @@ public interface ICouponRepository
 {
     Task<Coupon?> GetActiveByCodeAsync(string normalizedCode, CancellationToken cancellationToken = default);
 
+    Task<bool> ExistsActiveByCodeAsync(string normalizedCode, CancellationToken cancellationToken = default);
+
     Task<Coupon?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<int> CountCustomerRedemptionsAsync(Guid couponId, Guid customerId, CancellationToken cancellationToken = default);
