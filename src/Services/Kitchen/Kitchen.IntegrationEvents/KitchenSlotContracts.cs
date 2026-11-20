@@ -3,7 +3,7 @@
 public static class KitchenSlotContracts
 {
     public sealed record ConfirmKitchenCapacityCommand(
-    Guid OrderId,
+        Guid OrderId,
     Guid RestaurantId);
 
     public sealed record OrderAcceptedByKitchenIntegrationEvent(

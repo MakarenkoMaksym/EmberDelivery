@@ -3,7 +3,7 @@
 public static class OrderSagaLifecycleEvents
 {
     public sealed record OrderPaymentConfirmedIntegrationEvent(
-    Guid OrderId);
+        Guid OrderId);
 
     public sealed record OrderCookingStartedIntegrationEvent(
         Guid OrderId,

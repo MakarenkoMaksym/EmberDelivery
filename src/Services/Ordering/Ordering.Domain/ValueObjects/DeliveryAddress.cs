@@ -77,7 +77,7 @@ public sealed record DeliveryAddress : IValueObject
         DeliveryAddress address = new(
             street.Trim(),
             building.Trim(),
-             string.IsNullOrWhiteSpace(apartment) ? null : apartment.Trim(),
+            string.IsNullOrWhiteSpace(apartment) ? null : apartment.Trim(),
             string.IsNullOrWhiteSpace(deliveryNotes) ? null : deliveryNotes.Trim(),
             latitude,
             longitude);

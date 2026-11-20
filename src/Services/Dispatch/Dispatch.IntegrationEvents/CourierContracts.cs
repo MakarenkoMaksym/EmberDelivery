@@ -3,7 +3,7 @@
 public static class CourierContracts
 {
     public sealed record StartCourierMatchingCommand(
-    Guid OrderId,
+        Guid OrderId,
     Guid RestaurantId,
     Guid CustomerId);
 

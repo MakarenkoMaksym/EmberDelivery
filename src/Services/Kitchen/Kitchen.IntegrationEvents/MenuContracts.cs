@@ -3,7 +3,7 @@
 public static class MenuContracts
 {
     public sealed record RestaurantMenuSnapshotUpdatedIntegrationEvent(
-    Guid RestaurantId,
+        Guid RestaurantId,
     string SnapshotPayloadJson,
     DateTimeOffset OccurredAtUtc);
 }

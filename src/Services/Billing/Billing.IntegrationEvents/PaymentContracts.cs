@@ -3,7 +3,7 @@
 public static class PaymentContracts
 {
     public sealed record HoldFundsCommand(
-    Guid OrderId,
+        Guid OrderId,
     Guid CustomerId,
     decimal Amount,
     string Currency);

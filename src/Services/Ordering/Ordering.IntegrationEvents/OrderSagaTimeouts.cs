@@ -3,7 +3,7 @@
 public static class OrderSagaTimeouts
 {
     public sealed record TriggerCourierDispatchTimeout(
-    Guid OrderId);
+        Guid OrderId);
 
     public sealed record PaymentHoldTimeoutExpired(
         Guid OrderId);

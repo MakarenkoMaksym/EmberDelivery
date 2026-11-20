@@ -10,5 +10,3 @@ public sealed record OrderSubmittedIntegrationEvent(
 public sealed record OrderCancelledByCustomerIntegrationEvent(
     Guid OrderId,
     string Reason);
-
-
