@@ -10,8 +10,13 @@ namespace EmberDelivery.BuildingBlocks.Infrastructure.Persistence;
 public sealed class UnitOfWork<TDbContext>(TDbContext dbContext, IPublisher publisher) : IUnitOfWork
     where TDbContext : DbContext
 {
+    // Handlers may raise follow-up events, but a cascade this deep means two handlers keep re-triggering each other.
+    private const int MaxDispatchRounds = 10;
+
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        int round = 0;
+
         while (true)
         {
             var domainEntities = dbContext.ChangeTracker
@@ -23,6 +28,12 @@ public sealed class UnitOfWork<TDbContext>(TDbContext dbContext, IPublisher publ
             if (domainEntities.Count == 0)
             {
                 break;
+            }
+
+            if (round++ == MaxDispatchRounds)
+            {
+                throw new InvalidOperationException(
+                    $"Domain event dispatch did not settle after {MaxDispatchRounds} rounds; check for handlers that raise events cyclically.");
             }
 
             var domainEvents = domainEntities
