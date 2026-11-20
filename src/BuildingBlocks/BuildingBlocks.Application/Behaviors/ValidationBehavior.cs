@@ -15,54 +15,63 @@ public sealed class ValidationBehavior<TRequest, TResponse>(
     where TRequest : IRequest<TResponse>
     where TResponse : Result
 {
+    // Resolved once per closed generic type, so a failed validation costs a delegate call instead of a reflection lookup.
+    private static readonly Func<ValidationError, TResponse>? FailureFactory = CreateFailureFactory();
+
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (!validators.Any())
+        List<Error>? validationErrors = null;
+
+        // Sequential with a context per validator: FluentValidation results alias their context's failure list, so
+        // sharing one context across concurrent validators would duplicate errors and mutate a List from several threads.
+        foreach (IValidator<TRequest> validator in validators)
+        {
+            ValidationResult validationResult = await validator.ValidateAsync(
+                new ValidationContext<TRequest>(request),
+                cancellationToken);
+
+            foreach (ValidationFailure failure in validationResult.Errors)
+            {
+                validationErrors ??= [];
+                validationErrors.Add(Error.Validation(failure.PropertyName, failure.ErrorMessage));
+            }
+        }
+
+        if (validationErrors is null)
         {
             return await next(cancellationToken);
         }
 
-        ValidationContext<TRequest> context = new(request);
-
-        ValidationResult[] validationResults = await Task.WhenAll(
-            validators.Select(validator => validator.ValidateAsync(context, cancellationToken)));
-
-        Error[] validationErrors = validationResults
-            .Where(validationResult => validationResult.Errors.Count != 0)
-            .SelectMany(validationResult => validationResult.Errors)
-            .Select(validationFailure => Error.Validation(
-                validationFailure.PropertyName,
-                validationFailure.ErrorMessage))
-            .ToArray();
-
-        if (validationErrors.Length == 0)
+        if (FailureFactory is null)
         {
-            return await next(cancellationToken);
+            throw new InvalidOperationException(
+                $"ValidationFailure method was not found on response type {typeof(TResponse).Name}.");
         }
 
-        return CreateValidationResult(validationErrors);
+        return FailureFactory(new ValidationError([.. validationErrors]));
     }
 
-    private static TResponse CreateValidationResult(Error[] errors)
+    private static Func<ValidationError, TResponse>? CreateFailureFactory()
     {
-        ValidationError validationError = new(errors);
-
         if (typeof(TResponse) == typeof(Result))
         {
-            return (TResponse)(object)Result.Failure(validationError);
+            return error => (TResponse)Result.Failure(error);
         }
 
-        MethodInfo? validationFailureMethod = typeof(TResponse)
-            .GetMethod(nameof(Result<object>.ValidationFailure), BindingFlags.Public | BindingFlags.Static);
+        MethodInfo? validationFailureMethod = typeof(TResponse).GetMethod(
+            nameof(Result<object>.ValidationFailure),
+            BindingFlags.Public | BindingFlags.Static,
+            [typeof(Error)]);
 
-        if (validationFailureMethod is not null)
+        if (validationFailureMethod is null || validationFailureMethod.ReturnType != typeof(TResponse))
         {
-            return (TResponse)validationFailureMethod.Invoke(null, [validationError])!;
+            return null;
         }
 
-        throw new InvalidOperationException($"ValidationFailure method was not found on response type {typeof(TResponse).Name}.");
+        Func<Error, TResponse> factory = validationFailureMethod.CreateDelegate<Func<Error, TResponse>>();
+        return error => factory(error);
     }
 }
