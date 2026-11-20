@@ -1,12 +1,13 @@
 using EmberDelivery.BuildingBlocks.Application.Abstractions.Identity;
 using EmberDelivery.BuildingBlocks.Infrastructure.Identity;
-using EmberDelivery.BuildingBlocks.Infrastructure.Presentation;
 
-namespace EmberDelivery.Billing.Api.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
-public static class ServiceCollectionExtensions
+namespace EmberDelivery.BuildingBlocks.Infrastructure.Presentation;
+
+public static class WebApiServiceCollectionExtensions
 {
-    public static IServiceCollection AddWebApiServices(this IServiceCollection services)
+    public static IServiceCollection AddWebApiDefaults(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();

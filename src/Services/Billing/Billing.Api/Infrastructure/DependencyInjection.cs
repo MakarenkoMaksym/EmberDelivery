@@ -1,6 +1,7 @@
 using EmberDelivery.Billing.Api.Infrastructure.Messaging;
 using EmberDelivery.Billing.Api.Infrastructure.PaymentGateway;
 using EmberDelivery.Billing.Api.Infrastructure.Persistence;
+using EmberDelivery.BuildingBlocks.Infrastructure.Messaging;
 
 using MassTransit;
 
@@ -48,23 +49,13 @@ public static class DependencyInjection
                 // DbContext, re-reads the hold and re-calls the gateway with the same idempotency key. Unique violations
                 // are retried because the loser of a duplicate race then finds the winner's committed hold or ledger
                 // entry and turns into a no-op.
-                cfg.UseMessageRetry(retryCfg =>
+                cfg.UseDefaultMessageRetry(retryCfg =>
                 {
-                    retryCfg.Handle<DbUpdateConcurrencyException>();
                     retryCfg.Handle<PaymentGatewayUnavailableException>();
-                    retryCfg.Handle<PostgresException>(ex => ex.IsTransient);
                     retryCfg.Handle<DbUpdateException>(ex => ex.InnerException is PostgresException
-                    {
-                        IsTransient: true
-                    } or PostgresException
                     {
                         SqlState: PostgresErrorCodes.UniqueViolation
                     });
-                    retryCfg.Exponential(
-                        retryLimit: 5,
-                        minInterval: TimeSpan.FromMilliseconds(50),
-                        maxInterval: TimeSpan.FromSeconds(2),
-                        intervalDelta: TimeSpan.FromMilliseconds(100));
                 });
             });
 

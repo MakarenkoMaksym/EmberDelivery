@@ -1,17 +1,15 @@
 using EmberDelivery.BuildingBlocks.Infrastructure.Identity;
+using EmberDelivery.BuildingBlocks.Infrastructure.Persistence;
 using EmberDelivery.BuildingBlocks.Infrastructure.Presentation;
-using EmberDelivery.Ordering.Api.Extensions;
 using EmberDelivery.Ordering.Application;
 using EmberDelivery.Ordering.Infrastructure;
 using EmberDelivery.Ordering.Infrastructure.Persistence;
 using EmberDelivery.ServiceDefaults;
 
-using Microsoft.EntityFrameworkCore;
-
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-builder.Services.AddWebApiServices();
+builder.Services.AddWebApiDefaults();
 builder.AddKeycloakAuth();
 
 builder.Services.AddOrderingApplication();
@@ -25,11 +23,9 @@ app.MapDefaultEndpoints();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-
-    using IServiceScope scope = app.Services.CreateScope();
-    OrderingDbContext dbContext = scope.ServiceProvider.GetRequiredService<OrderingDbContext>();
-    await dbContext.Database.MigrateAsync();
 }
+
+await app.ApplyMigrationsInDevelopmentAsync<OrderingDbContext>();
 
 app.UseExceptionHandler();
 app.UseAuthentication();

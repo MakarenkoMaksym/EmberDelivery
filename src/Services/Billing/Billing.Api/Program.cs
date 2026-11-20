@@ -2,15 +2,14 @@ using EmberDelivery.Billing.Api.Extensions;
 using EmberDelivery.Billing.Api.Infrastructure;
 using EmberDelivery.Billing.Api.Infrastructure.Persistence;
 using EmberDelivery.BuildingBlocks.Infrastructure.Identity;
+using EmberDelivery.BuildingBlocks.Infrastructure.Persistence;
 using EmberDelivery.BuildingBlocks.Infrastructure.Presentation;
 using EmberDelivery.ServiceDefaults;
-
-using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-builder.Services.AddWebApiServices();
+builder.Services.AddWebApiDefaults();
 builder.AddKeycloakAuth(authorization => authorization.AddPolicy(
     BillingPolicies.CustomerOrAdmin,
     policy => policy.RequireRole(Roles.Customer, Roles.Admin)));
@@ -25,11 +24,9 @@ app.MapDefaultEndpoints();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-
-    using IServiceScope scope = app.Services.CreateScope();
-    BillingDbContext dbContext = scope.ServiceProvider.GetRequiredService<BillingDbContext>();
-    await dbContext.Database.MigrateAsync();
 }
+
+await app.ApplyMigrationsInDevelopmentAsync<BillingDbContext>();
 
 app.UseExceptionHandler();
 app.UseAuthentication();
