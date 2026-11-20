@@ -16,6 +16,9 @@ public static class Extensions
     private const string HealthEndpointPath = "/health";
     private const string AlivenessEndpointPath = "/alive";
 
+    // MassTransit's ActivitySource and Meter name; without it traces break at the broker and the saga flow is invisible.
+    private const string MassTransitInstrumentationName = "MassTransit";
+
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder)
         where TBuilder : IHostApplicationBuilder
     {
@@ -51,11 +54,13 @@ public static class Extensions
             {
                 metrics.AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddRuntimeInstrumentation();
+                    .AddRuntimeInstrumentation()
+                    .AddMeter(MassTransitInstrumentationName);
             })
             .WithTracing(tracing =>
             {
                 tracing.AddSource(builder.Environment.ApplicationName)
+                    .AddSource(MassTransitInstrumentationName)
                     .AddAspNetCoreInstrumentation(instrumentation =>
                         instrumentation.Filter = context =>
                             !context.Request.Path.StartsWithSegments(HealthEndpointPath)
