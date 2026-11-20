@@ -48,11 +48,11 @@ internal sealed class OrderLineConfiguration : EntityConfiguration<OrderLine>
 
             // EF Core 10 has no ComplexProperty on owned types, so Money is flattened into the two columns it needs.
             modBuilder.Ignore(m => m.Price);
-            modBuilder.Property<decimal>("PriceAmount")
+            modBuilder.Property(m => m.PriceAmount)
                 .HasColumnName("price_amount")
                 .HasPrecision(18, 2)
                 .IsRequired();
-            modBuilder.Property<string>("PriceCurrency")
+            modBuilder.Property(m => m.PriceCurrency)
                 .HasColumnName("price_currency")
                 .HasMaxLength(3)
                 .IsRequired();

@@ -37,7 +37,8 @@ public sealed record SelectedModifier : IValueObject
 
     public Money Price => new(PriceAmount, PriceCurrency);
 
-    private decimal PriceAmount { get; }
+    // Public so EF configuration and read-side projections can reference the persisted columns in a type-safe way.
+    public decimal PriceAmount { get; }
 
-    private string PriceCurrency { get; }
+    public string PriceCurrency { get; }
 }

@@ -21,46 +21,41 @@ internal static class PaymentQuery
         ICurrentUserService currentUser,
         CancellationToken cancellationToken)
     {
-        PaymentHold? hold = await dbContext.PaymentHolds
+        // Projected in SQL, ledger ordering included, so the aggregate and its ledger are never materialized for a read.
+        PaymentResponse? payment = await dbContext.PaymentHolds
             .AsNoTracking()
-            .Include(x => x.LedgerEntries)
-            .FirstOrDefaultAsync(predicate, cancellationToken);
+            .Where(predicate)
+            .Select(hold => new PaymentResponse(
+                hold.Id,
+                hold.OrderId,
+                hold.CustomerId,
+                hold.Status.ToString(),
+                hold.Amount.Amount,
+                hold.Amount.Currency,
+                hold.FailureReason,
+                hold.ReleaseReason,
+                hold.CreatedAtUtc,
+                hold.LedgerEntries
+                    .OrderBy(entry => entry.OccurredAtUtc)
+                    .Select(entry => new LedgerEntryResponse(
+                        entry.Id,
+                        entry.Type.ToString(),
+                        entry.Amount.Amount,
+                        entry.Amount.Currency,
+                        entry.OccurredAtUtc))
+                    .ToList()))
+            .FirstOrDefaultAsync(cancellationToken);
 
-        if (hold is null)
+        if (payment is null)
         {
             return Result.Failure<PaymentResponse>(notFoundError);
         }
 
-        if (!currentUser.IsInRole(Roles.Admin) && hold.CustomerId != currentUser.GetUserId())
+        if (!currentUser.IsInRole(Roles.Admin) && payment.CustomerId != currentUser.GetUserId())
         {
             return Result.Failure<PaymentResponse>(PaymentHoldErrors.ForbiddenAccess);
         }
 
-        return Result.Success(ToResponse(hold));
-    }
-
-    private static PaymentResponse ToResponse(PaymentHold hold)
-    {
-        var ledgerEntries = hold.LedgerEntries
-            .OrderBy(entry => entry.OccurredAtUtc)
-            .Select(entry => new LedgerEntryResponse(
-                entry.Id,
-                entry.Type.ToString(),
-                entry.Amount.Amount,
-                entry.Amount.Currency,
-                entry.OccurredAtUtc))
-            .ToList();
-
-        return new PaymentResponse(
-            hold.Id,
-            hold.OrderId,
-            hold.CustomerId,
-            hold.Status.ToString(),
-            hold.Amount.Amount,
-            hold.Amount.Currency,
-            hold.FailureReason,
-            hold.ReleaseReason,
-            hold.CreatedAtUtc,
-            ledgerEntries);
+        return Result.Success(payment);
     }
 }
