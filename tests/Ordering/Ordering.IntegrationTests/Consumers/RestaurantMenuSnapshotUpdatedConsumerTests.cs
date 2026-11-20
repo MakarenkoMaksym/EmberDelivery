@@ -19,15 +19,20 @@ namespace EmberDelivery.Ordering.IntegrationTests.Consumers;
 
 public sealed class RestaurantMenuSnapshotUpdatedConsumerTests(OrderingAppFixture fixture) : BaseIntegrationTest(fixture)
 {
+    private const string StaleCacheSentinel = "cached-before-consume";
+
     private static readonly DateTimeOffset EarlierUtc = new(2026, 3, 1, 10, 0, 0, TimeSpan.Zero);
     private static readonly DateTimeOffset LaterUtc = new(2026, 3, 1, 12, 0, 0, TimeSpan.Zero);
+    private static readonly TimeSpan CacheEvictionTimeout = TimeSpan.FromSeconds(10);
 
     [Fact]
-    public async Task Consume_FirstSnapshotForRestaurant_ShouldStoreProjectionAndWarmRedisCache()
+    public async Task Consume_FirstSnapshotForRestaurant_ShouldStoreProjectionAndInvalidateRedisCache()
     {
         // Arrange
+        // The consumer only invalidates; the reader repopulates the cache from committed PostgreSQL data.
         var restaurantId = Guid.NewGuid();
         string payloadJson = TestMenu.CreatePayloadJson(restaurantId);
+        await GetRedisDatabase().StringSetAsync(CacheKey(restaurantId), StaleCacheSentinel);
 
         // Act
         await PublishAndWaitForConsumptionAsync(
@@ -38,8 +43,35 @@ public sealed class RestaurantMenuSnapshotUpdatedConsumerTests(OrderingAppFixtur
         ShouldBeSameJson(record.PayloadJson, payloadJson);
         record.UpdatedAtUtc.Should().Be(LaterUtc);
 
+        (await WaitUntilCacheEvictedAsync(restaurantId)).Should().BeTrue("the post-commit hook must evict the stale entry");
+    }
+
+    [Fact]
+    public async Task Consume_SnapshotOlderThanStoredOne_ShouldLeaveRedisCacheUntouched()
+    {
+        // Arrange
+        // A stale snapshot changes nothing in PostgreSQL, so touching the cache would only cause needless misses or,
+        // worse, cache the outdated payload.
+        var restaurantId = Guid.NewGuid();
+        await GetRedisDatabase().StringSetAsync(CacheKey(restaurantId), StaleCacheSentinel);
+        await PublishAndWaitForConsumptionAsync(new RestaurantMenuSnapshotUpdatedIntegrationEvent(
+            restaurantId,
+            TestMenu.CreatePayloadJson(restaurantId, isAcceptingOrders: true),
+            LaterUtc));
+
+        // Waiting for the first eviction keeps it from racing with the sentinel written next.
+        (await WaitUntilCacheEvictedAsync(restaurantId)).Should().BeTrue();
+        await GetRedisDatabase().StringSetAsync(CacheKey(restaurantId), StaleCacheSentinel);
+
+        // Act
+        await PublishAndWaitForConsumptionAsync(new RestaurantMenuSnapshotUpdatedIntegrationEvent(
+            restaurantId,
+            TestMenu.CreatePayloadJson(restaurantId, isAcceptingOrders: false),
+            EarlierUtc));
+
+        // Assert
         RedisValue cached = await GetRedisDatabase().StringGetAsync(CacheKey(restaurantId));
-        cached.ToString().Should().Be(payloadJson);
+        cached.ToString().Should().Be(StaleCacheSentinel);
     }
 
     [Fact]
@@ -108,6 +140,25 @@ public sealed class RestaurantMenuSnapshotUpdatedConsumerTests(OrderingAppFixtur
 
     // Duplicated on purpose: the cache key is a contract shared with the reader, so a silent rename must fail here.
     private static string CacheKey(Guid restaurantId) => $"ordering:menu-snapshot:{restaurantId:N}";
+
+    // Eviction runs after the outbox commit, i.e. after the inbox row the publish helper waits for becomes visible.
+    private async Task<bool> WaitUntilCacheEvictedAsync(Guid restaurantId)
+    {
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken);
+        timeout.CancelAfter(CacheEvictionTimeout);
+
+        while (!timeout.IsCancellationRequested)
+        {
+            if (!await GetRedisDatabase().KeyExistsAsync(CacheKey(restaurantId)))
+            {
+                return true;
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(50), CancellationToken);
+        }
+
+        return false;
+    }
 
     private IDatabase GetRedisDatabase() =>
         Fixture.Services.GetRequiredService<IConnectionMultiplexer>().GetDatabase();

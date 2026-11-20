@@ -13,13 +13,11 @@ internal sealed class RestaurantMenuSnapshotReader(
     OrderingDbContext dbContext,
     ILogger<RestaurantMenuSnapshotReader> logger) : IRestaurantMenuSnapshotReader
 {
-    private static readonly TimeSpan CacheTtl = TimeSpan.FromHours(6);
-
     public async Task<RestaurantMenuSnapshot?> GetByRestaurantIdAsync(
         Guid restaurantId,
         CancellationToken cancellationToken = default)
     {
-        string cacheKey = GetCacheKey(restaurantId);
+        string cacheKey = MenuSnapshotCache.KeyFor(restaurantId);
 
         // Try fast path from Redis cache. If Redis is unreachable or slow, degrade gracefully to PostgreSQL.
         string? cachedJson = await TryReadFromRedisAsync(cacheKey, restaurantId, cancellationToken);
@@ -43,8 +41,6 @@ internal sealed class RestaurantMenuSnapshotReader(
 
         return MenuSnapshotJson.Deserialize(record.PayloadJson);
     }
-
-    internal static string GetCacheKey(Guid restaurantId) => $"ordering:menu-snapshot:{restaurantId:N}";
 
     private async Task<string?> TryReadFromRedisAsync(
         string cacheKey,
@@ -76,7 +72,7 @@ internal sealed class RestaurantMenuSnapshotReader(
         try
         {
             IDatabase db = redisMultiplexer.GetDatabase();
-            await db.StringSetAsync(cacheKey, payloadJson, CacheTtl);
+            await db.StringSetAsync(cacheKey, payloadJson, MenuSnapshotCache.Ttl);
         }
         catch (Exception ex)
         {
